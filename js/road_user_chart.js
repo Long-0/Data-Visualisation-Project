@@ -1,10 +1,4 @@
-d3.csv(`${dataPath}road_user_trends.csv`, d => ({
-    year: +d["Calendar year"],
-    roadUser: d["Road user group"],
-    hospitalisations: +d.Hospitalisations,
-    bedDays: +d.Net_Bed_Days,
-    deaths: +d.Died_cases
-})).then(data => {
+const drawRoadUserChart = data => {
     const values = data
         .filter(d => d.year === 2021)
         .sort((a, b) => d3.descending(a.hospitalisations, b.hospitalisations));
@@ -70,4 +64,4 @@ d3.csv(`${dataPath}road_user_trends.csv`, d => ({
                 .style("top", `${event.clientY - 30}px`);
         })
         .on("mouseleave", () => tooltip.style("opacity", 0));
-}).catch(showLoadError);
+};

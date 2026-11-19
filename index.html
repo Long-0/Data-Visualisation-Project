@@ -3,66 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Australian Injury Hospitalisation Dashboard</title>
+    <title>Injury Insights Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
-    <main class="dashboard">
-        <header>
-            <p class="project-label">Data visualisation project</p>
-            <h1>Australian injury hospitalisations</h1>
-            <p class="intro">
-                Explore changes in hospitalisations across time, states, road-user groups,
-                age and sex, and First Nations status.
-            </p>
-        </header>
+    <main class="app-shell">
+        <aside class="sidebar">
+        </aside>
 
-        <section class="chart-grid">
-            <article class="chart-card chart-card-wide">
-                <h2>National hospitalisations by year</h2>
-                <p class="chart-description">
-                    The annual total shows how the national hospitalisation burden changed from 2011 to 2021.
-                </p>
-                <div id="national-chart" class="chart"
-                    aria-label="Line chart of national hospitalisations by year"></div>
-            </article>
+        <section class="dashboard">
+            <header class="topbar">
+                <div>
+                    <p class="project-label">DATA VISUALISATION PROJECT</p>
+                    <h1>Australian injury hospitalisations</h1>
+                    <p class="intro">A clear view of hospitalisation trends, patterns and population groups.</p>
+                </div>
+                <div class="period-control" aria-label="Selected period">
+                    <button>2011–2021</button>
+                    <span>⌄</span>
+                </div>
+            </header>
 
-            <article class="chart-card">
-                <h2>Hospitalisations by state in 2021</h2>
-                <p class="chart-description">
-                    A ranked comparison highlights the difference in hospitalisation counts between states and territories.
-                </p>
-                <div id="state-chart" class="chart"
-                    aria-label="Bar chart of state hospitalisations in 2021"></div>
-            </article>
+            <section id="overview" class="metric-grid" aria-label="Key figures">
+                <article class="metric-card"><div class="metric-icon blue">▥</div><div><span>Total hospitalisations</span><strong>39.5K</strong><small class="positive">▲ 4.1% <em>vs. 2020</em></small></div></article>
+                <article class="metric-card"><div class="metric-icon purple">◉</div><div><span>Net bed days</span><strong>198.9K</strong><small class="positive">▲ 6.3% <em>vs. 2020</em></small></div></article>
+                <article class="metric-card"><div class="metric-icon orange">♙</div><div><span>Highest state</span><strong>Vic</strong><small>11,130 admissions</small></div></article>
+                <article class="metric-card"><div class="metric-icon green">↗</div><div><span>Top road-user group</span><strong>Car driver</strong><small>13,327 admissions</small></div></article>
+            </section>
 
-            <article class="chart-card">
-                <h2>Road-user hospitalisations in 2021</h2>
-                <p class="chart-description">
-                    The latest year identifies which road-user groups contributed the most hospitalisations.
-                </p>
-                <div id="road-user-chart" class="chart"
-                    aria-label="Bar chart of road-user hospitalisations in 2021"></div>
-            </article>
-
-            <article class="chart-card chart-card-wide">
-                <h2>Hospitalisations by age group and sex in 2021</h2>
-                <p class="chart-description">
-                    Grouped bars make the difference between female and male hospitalisations visible within each age group.
-                </p>
-                <div id="age-chart" class="chart"
-                    aria-label="Grouped bar chart of age and sex hospitalisations in 2021"></div>
-            </article>
-
-            <article class="chart-card chart-card-wide">
-                <h2>First Nations and non-Indigenous hospitalisations</h2>
-                <p class="chart-description">
-                    Annual totals are aggregated from the two half-year records and separated by First Nations status.
-                </p>
-                <div id="first-nations-chart" class="chart"
-                    aria-label="Line chart comparing First Nations and non-Indigenous hospitalisations"></div>
-            </article>
+            <section class="dashboard-grid">
+                <article id="trends" class="chart-card chart-card-large">
+                    <div class="card-heading"><div><span class="eyebrow">NATIONAL OVERVIEW</span><h2>Hospitalisations over time</h2></div><span class="card-badge">2011–2021</span></div>
+                    <p class="chart-description">Annual hospitalisation totals across Australia.</p>
+                    <div id="national-chart" class="chart" aria-label="Line chart of national hospitalisations by year"></div>
+                </article>
+                <article class="chart-card">
+                    <div class="card-heading"><div><span class="eyebrow">LATEST YEAR</span><h2>By state and territory</h2></div></div>
+                    <p class="chart-description">Hospitalisations recorded in 2021.</p>
+                    <div id="state-chart" class="chart" aria-label="Bar chart of state hospitalisations in 2021"></div>
+                </article>
+                <article id="breakdown" class="chart-card">
+                    <div class="card-heading"><div><span class="eyebrow">ROAD USERS</span><h2>Who is most affected?</h2></div></div>
+                    <p class="chart-description">Hospitalisations by road-user group in 2021.</p>
+                    <div id="road-user-chart" class="chart" aria-label="Bar chart of road-user hospitalisations in 2021"></div>
+                </article>
+                <article class="chart-card chart-card-large">
+                    <div class="card-heading"><div><span class="eyebrow">AGE AND SEX</span><h2>Hospitalisations by age group</h2></div></div>
+                    <p class="chart-description">Grouped comparison of female and male admissions in 2021.</p>
+                    <div id="age-chart" class="chart" aria-label="Grouped bar chart of age and sex hospitalisations in 2021"></div>
+                </article>
+                <article id="about" class="chart-card chart-card-large">
+                    <div class="card-heading"><div><span class="eyebrow">EQUITY LENS</span><h2>First Nations comparison</h2></div></div>
+                    <p class="chart-description">Annual hospitalisations by First Nations status.</p>
+                    <div id="first-nations-chart" class="chart" aria-label="Line chart comparing First Nations and non-Indigenous hospitalisations"></div>
+                </article>
+            </section>
         </section>
 
         <p id="load-error" class="load-error" hidden>
@@ -70,11 +66,12 @@
         </p>
     </main>
 
-    <script src="js/chart-utils.js"></script>
-    <script src="js/national-chart.js"></script>
-    <script src="js/state-chart.js"></script>
-    <script src="js/road-user-chart.js"></script>
-    <script src="js/age-chart.js"></script>
-    <script src="js/first-nations-chart.js"></script>
+    <script src="js/chart-helpers.js"></script>
+    <script src="js/national_chart.js"></script>
+    <script src="js/state_chart.js"></script>
+    <script src="js/road_user_chart.js"></script>
+    <script src="js/age_chart.js"></script>
+    <script src="js/first_nations_chart.js"></script>
+    <script src="js/load_data.js"></script>
 </body>
 </html>

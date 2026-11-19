@@ -1,9 +1,4 @@
-d3.csv(`${dataPath}national_annual.csv`, d => ({
-    year: d["Calendar year"],
-    hospitalisations: +d.Hospitalisations,
-    bedDays: +d.Net_Bed_Days,
-    deaths: +d.Died_cases
-})).then(data => {
+const drawNationalChart = data => {
     const { svg, width, height, margin } = createSvg("#national-chart");
 
     const x = d3.scalePoint()
@@ -68,4 +63,4 @@ d3.csv(`${dataPath}national_annual.csv`, d => ({
                 .style("top", `${event.clientY - 30}px`);
         })
         .on("mouseleave", () => tooltip.style("opacity", 0));
-}).catch(showLoadError);
+};

@@ -1,8 +1,4 @@
-d3.csv(`${dataPath}first_nations_trends.csv`, d => ({
-    year: +d["Calendar year"],
-    status: d["First Nations status"],
-    hospitalisations: +d.Hospitalisations
-})).then(data => {
+const drawFirstNationsChart = data => {
     const values = [];
 
     d3.rollup(
@@ -106,4 +102,4 @@ d3.csv(`${dataPath}first_nations_trends.csv`, d => ({
                 `<span class="legend-swatch" style="background:${index ? colors.teal : colors.orange}"></span>${status}`
             );
     });
-}).catch(showLoadError);
+};

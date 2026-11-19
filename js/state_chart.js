@@ -1,8 +1,4 @@
-d3.csv(`${dataPath}state_trends.csv`, d => ({
-    year: +d.year,
-    state: d.state,
-    hospitalisations: +d.hospitalisations
-})).then(data => {
+const drawStateChart = data => {
     const values = data
         .filter(d => d.year === 2021)
         .sort((a, b) => d3.descending(a.hospitalisations, b.hospitalisations));
@@ -65,4 +61,4 @@ d3.csv(`${dataPath}state_trends.csv`, d => ({
                 .style("top", `${event.clientY - 30}px`);
         })
         .on("mouseleave", () => tooltip.style("opacity", 0));
-}).catch(showLoadError);
+};

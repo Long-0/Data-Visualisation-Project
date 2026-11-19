@@ -1,11 +1,9 @@
-const dataPath = "DATA/processed/";
-
 const colors = {
-    blue: "#1769aa",
-    teal: "#008c95",
-    orange: "#e07a2d",
-    female: "#e07a2d",
-    male: "#1769aa"
+    blue: "#266be8",
+    teal: "#28a879",
+    orange: "#f39a4a",
+    female: "#f39a4a",
+    male: "#266be8"
 };
 
 const formatNumber = d3.format(",");

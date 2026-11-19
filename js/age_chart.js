@@ -1,9 +1,4 @@
-d3.csv(`${dataPath}age_severity.csv`, d => ({
-    year: +d["Calendar year"],
-    age: d["Age group"],
-    sex: d.Sex,
-    hospitalisations: +d.Hospitalisations
-})).then(data => {
+const drawAgeChart = data => {
     const values = data.filter(
         d => d.year === 2021 &&
             (d.sex === "Female" || d.sex === "Male")
@@ -91,4 +86,4 @@ d3.csv(`${dataPath}age_severity.csv`, d => ({
                 `<span class="legend-swatch" style="background:${sex === "Female" ? colors.female : colors.male}"></span>${sex}`
             );
     });
-}).catch(showLoadError);
+};
