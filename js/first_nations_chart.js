@@ -19,7 +19,9 @@ const drawFirstNationsChart = data => {
     const statuses = [...new Set(values.map(d => d.status))];
     const years = [...new Set(values.map(d => d.year))];
     const { svg, width, height, margin } = createSvg(
-        "#first-nations-chart"
+        "#first-nations-chart",
+        300,
+        { top: 20, right: 24, bottom: 52, left: 84 }
     );
 
     const x = d3.scalePoint()
@@ -32,6 +34,7 @@ const drawFirstNationsChart = data => {
         .range([height - margin.bottom, margin.top]);
 
     addYAxisGrid(svg, y, width, margin);
+    addXAxisGrid(svg, x, height, margin);
 
     svg.append("g")
         .attr("class", "axis")
@@ -56,13 +59,14 @@ const drawFirstNationsChart = data => {
 
     statuses.forEach((status, index) => {
         const statusValues = values.filter(d => d.status === status);
-        const color = index ? colors.teal : colors.orange;
+        const color = status === "First Nations people" ? colors.orange : colors.teal;
 
         svg.append("path")
             .datum(statusValues)
             .attr("fill", "none")
             .attr("stroke", color)
             .attr("stroke-width", 2.5)
+            .attr("stroke-dasharray", status === "First Nations people" ? "7 3" : null)
             .attr(
                 "d",
                 d3.line()
@@ -78,10 +82,12 @@ const drawFirstNationsChart = data => {
             .attr("cy", d => y(d.hospitalisations))
             .attr("r", 3.5)
             .attr("fill", color)
+            .attr("tabindex", 0)
+            .attr("aria-label", d => `${d.status}, ${d.year}: ${formatNumber(d.hospitalisations)} hospitalisations`)
             .on("mouseenter", (event, d) => {
                 tooltip.style("opacity", 1)
                     .html(
-                        `<strong>${d.status}, ${d.year}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations`
+                        `<strong>${d.status}, ${d.year}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations<br>Unit: count`
                     );
             })
             .on("mousemove", event => {
@@ -89,17 +95,19 @@ const drawFirstNationsChart = data => {
                     .style("top", `${event.clientY - 30}px`);
             })
             .on("mouseleave", () => tooltip.style("opacity", 0));
+
     });
 
     const legend = d3.select("#first-nations-chart")
         .append("div")
         .attr("class", "legend");
 
-    statuses.forEach((status, index) => {
+    statuses.forEach(status => {
+        const color = status === "First Nations people" ? colors.orange : colors.teal;
         legend.append("span")
             .attr("class", "legend-item")
             .html(
-                `<span class="legend-swatch" style="background:${index ? colors.teal : colors.orange}"></span>${status}`
+                `<span class="legend-swatch" style="background:${color}"></span>${status}`
             );
     });
 };

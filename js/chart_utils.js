@@ -1,9 +1,11 @@
 const colors = {
-    blue: "#266be8",
-    teal: "#28a879",
-    orange: "#f39a4a",
-    female: "#f39a4a",
-    male: "#266be8"
+    blue: "#0072B2",
+    teal: "#009E73",
+    orange: "#D55E00",
+    female: "#0072B2",
+    male: "#D55E00",
+    grey: "#9AA5B1",
+    ink: "#17233c"
 };
 
 const formatNumber = d3.format(",");
@@ -23,7 +25,8 @@ const createSvg = (
         .attr("width", "100%")
         .attr("height", height)
         .attr("viewBox", `0 0 ${width} ${height}`)
-        .attr("role", "img");
+        .attr("role", "img")
+        .attr("aria-label", container.attr("aria-label") || "Data chart");
 
     return { svg, width, height, margin };
 };
@@ -46,6 +49,17 @@ const addYAxisGrid = (svg, y, width, margin) => {
         );
 };
 
+const addXAxisGrid = (svg, x, height, margin) => {
+    svg.append("g")
+        .attr("class", "grid-line")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(
+            d3.axisBottom(x)
+                .tickSize(-(height - margin.top - margin.bottom))
+                .tickFormat("")
+        );
+};
+
 const addAxisLabels = (svg, width, height, margin, xLabel, yLabel) => {
     svg.append("text")
         .attr("class", "axis-label")
@@ -63,8 +77,3 @@ const addAxisLabels = (svg, width, height, margin, xLabel, yLabel) => {
         .text(yLabel);
 };
 
-const showLoadError = error => {
-    console.error("Unable to load chart data:", error);
-    d3.select("#load-error")
-        .attr("hidden", null);
-};

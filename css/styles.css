@@ -1,7 +1,7 @@
 :root {
     color-scheme: light;
     --ink: #17233c;
-    --muted: #71809a;
+    --muted: #5f6b7a;
     --line: #e5eaf2;
     --surface: #ffffff;
     --background: #f6f8fc;
@@ -144,7 +144,7 @@ nav a.active, nav a:hover {
     margin-bottom: 28px;
 }
 
-.project-label, .eyebrow {
+.project-label {
     margin: 0 0 8px;
     color: var(--blue);
     font-size: 0.68rem;
@@ -168,27 +168,6 @@ h1 {
     font-size: 0.91rem;
 }
 
-.period-control {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 13px;
-    color: var(--muted);
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    font-size: 0.82rem;
-}
-
-.period-control button {
-    padding: 0;
-    color: var(--ink);
-    background: none;
-    border: 0;
-    font: inherit;
-    font-weight: 700;
-}
-
 .metric-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -197,31 +176,19 @@ h1 {
 }
 
 .metric-card {
-    display: flex;
-    align-items: center;
-    gap: 13px;
+    display: grid;
+    align-content: center;
+    gap: 5px;
     min-width: 0;
-    padding: 18px;
+    min-height: 118px;
+    padding: 16px 18px;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 12px;
     box-shadow: 0 4px 14px rgba(27, 47, 84, 0.04);
 }
-
-.metric-icon {
-    display: grid;
-    width: 40px;
-    height: 40px;
-    flex: 0 0 auto;
-    place-items: center;
-    border-radius: 10px;
-    font-size: 1.25rem;
-}
-.metric-icon.blue { color: var(--blue); background: var(--blue-soft); }
-.metric-icon.purple { color: var(--purple); background: #f0edff; }
-.metric-icon.orange { color: var(--orange); background: #fff3e8; }
-.metric-icon.green { color: var(--green); background: #e8f8f1; }
-.metric-card strong { color: var(--ink); font-size: 1.3rem; line-height: 1.2; }
+.metric-label { color: var(--muted); font-size: 0.78rem; }
+.metric-card strong { color: var(--ink); font-size: 1.35rem; line-height: 1.2; }
 .metric-card small { white-space: nowrap; }
 .metric-card small em { color: var(--muted); font-style: normal; font-weight: 400; }
 .metric-card .positive { color: var(--green); font-weight: 700; }
@@ -250,8 +217,6 @@ h1 {
     gap: 12px;
 }
 
-.eyebrow { margin-bottom: 5px; color: var(--muted); font-size: 0.62rem; }
-
 h2 {
     margin-bottom: 0;
     color: var(--ink);
@@ -259,35 +224,22 @@ h2 {
     letter-spacing: -0.02em;
 }
 
-.card-badge {
-    padding: 5px 9px;
-    color: var(--blue);
-    background: var(--blue-soft);
-    border-radius: 5px;
-    font-size: 0.68rem;
-    font-weight: 700;
-}
-
-.chart-description {
-    min-height: 0;
-    margin: 7px 0 10px;
-    color: var(--muted);
-    font-size: 0.78rem;
-}
-
 .chart { min-height: 270px; }
 
 .chart-card-large .chart { min-height: 286px; }
 
-.axis path, .axis line { stroke: var(--line); }
-.axis text { fill: var(--muted); font-size: 11px; }
-.axis-label { fill: var(--muted); font-size: 11px; font-weight: 600; }
-.grid-line { stroke: #eef2f7; }
-.legend { color: var(--muted); font-size: 11px; }
+.axis path { stroke: #aeb9c8; }
+.axis line { stroke: #d7dee8; }
+.axis text { fill: var(--muted); font-size: 12px; }
+.axis-label { fill: var(--muted); font-size: 12px; font-weight: 600; }
+.bar { stroke: rgba(23, 35, 60, 0.18); stroke-width: 0.8px; }
+.grid-line { stroke: #e5eaf0; stroke-width: 1px; }
+.grid-line path { display: none; }
+.grid-line line { stroke: #e5eaf0; }
+.legend { color: var(--muted); font-size: 12px; }
 .legend-item { display: inline-flex; align-items: center; margin-right: 16px; }
 .legend-swatch { width: 9px; height: 9px; margin-right: 5px; border-radius: 50%; }
 .tooltip { position: fixed; z-index: 2; pointer-events: none; padding: 8px 10px; color: #fff; background: rgba(23, 35, 60, 0.94); border-radius: 6px; font-size: 12px; line-height: 1.45; }
-.load-error { margin-top: 24px; padding: 12px; color: #9b2c2c; background: #fff5f5; border: 1px solid #feb2b2; }
 
 @media (max-width: 1050px) {
     .sidebar { width: 205px; }
@@ -303,7 +255,6 @@ h2 {
     nav a { white-space: nowrap; }
     .dashboard { padding: 24px 14px 40px; }
     .topbar { display: block; }
-    .period-control { width: max-content; margin-top: 18px; }
     .metric-grid, .dashboard-grid { grid-template-columns: 1fr; }
     .chart-card-large { grid-column: auto; }
 }

@@ -26,8 +26,6 @@ const drawAgeChart = data => {
         .nice()
         .range([height - margin.bottom, margin.top]);
 
-    addYAxisGrid(svg, y, width, margin);
-
     svg.append("g")
         .attr("class", "axis")
         .attr("transform", `translate(0,${height - margin.bottom})`)
@@ -58,15 +56,18 @@ const drawAgeChart = data => {
     groups.selectAll("rect")
         .data(age => values.filter(d => d.age === age))
         .join("rect")
+        .attr("class", "bar")
         .attr("x", d => xSex(d.sex))
         .attr("y", d => y(d.hospitalisations))
         .attr("width", xSex.bandwidth())
         .attr("height", d => height - margin.bottom - y(d.hospitalisations))
         .attr("fill", d => d.sex === "Female" ? colors.female : colors.male)
+        .attr("tabindex", 0)
+        .attr("aria-label", d => `${d.age}, ${d.sex}, 2021: ${formatNumber(d.hospitalisations)} hospitalisations`)
         .on("mouseenter", (event, d) => {
             tooltip.style("opacity", 1)
                 .html(
-                    `<strong>${d.age}, ${d.sex}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations`
+                    `<strong>${d.age}, ${d.sex}, 2021</strong><br>${formatNumber(d.hospitalisations)} hospitalisations<br>Unit: count`
                 );
         })
         .on("mousemove", event => {
@@ -86,4 +87,5 @@ const drawAgeChart = data => {
                 `<span class="legend-swatch" style="background:${sex === "Female" ? colors.female : colors.male}"></span>${sex}`
             );
     });
+
 };
