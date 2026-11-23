@@ -1,6 +1,7 @@
-const drawStateChart = data => {
+const drawStateChart = (data, selectedYear = 2021) => {
+    d3.select("#state-chart").html("");
     const values = data
-        .filter(d => d.year === 2021)
+        .filter(d => d.year === selectedYear)
         .sort((a, b) => d3.descending(a.hospitalisations, b.hospitalisations));
 
     const { svg, width, height, margin } = createSvg(
@@ -40,7 +41,7 @@ const drawStateChart = data => {
 
     const tooltip = addTooltip();
 
-    svg.selectAll("rect")
+    const bars = svg.selectAll("rect")
         .data(values)
         .join("rect")
         .attr("class", "bar")
@@ -50,17 +51,21 @@ const drawStateChart = data => {
         .attr("height", d => height - margin.bottom - y(d.hospitalisations))
         .attr("fill", d => d.state === "Vic" ? colors.orange : colors.grey)
         .attr("tabindex", 0)
-        .attr("aria-label", d => `${d.state}, 2021: ${formatNumber(d.hospitalisations)} hospitalisations`)
-        .on("mouseenter", (event, d) => {
-            tooltip.style("opacity", 1)
-                .html(
-                    `<strong>${d.state}, 2021</strong><br>${formatNumber(d.hospitalisations)} hospitalisations<br>Unit: count`
-                );
-        })
-        .on("mousemove", event => {
-            tooltip.style("left", `${event.clientX + 12}px`)
-                .style("top", `${event.clientY - 30}px`);
-        })
-        .on("mouseleave", () => tooltip.style("opacity", 0));
+        .attr("aria-label", d => `${d.state}, ${selectedYear}: ${formatNumber(d.hospitalisations)} hospitalisations`)
+        .attr("aria-pressed", "false")
+        .attr("y", height - margin.bottom)
+        .attr("height", 0);
+
+    bars.transition()
+        .duration(650)
+        .ease(d3.easeCubicOut)
+        .attr("y", d => y(d.hospitalisations))
+        .attr("height", d => height - margin.bottom - y(d.hospitalisations));
+
+    bindTooltip(
+        bars,
+        tooltip,
+        d => `<strong>${d.state}, ${selectedYear}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations`
+    );
 
 };

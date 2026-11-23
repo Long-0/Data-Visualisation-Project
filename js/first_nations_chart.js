@@ -74,7 +74,7 @@ const drawFirstNationsChart = data => {
                     .y(d => y(d.hospitalisations))
             );
 
-        svg.selectAll(`.status-${index}`)
+        const points = svg.selectAll(`.status-${index}`)
             .data(statusValues)
             .join("circle")
             .attr("class", `status-${index}`)
@@ -83,18 +83,20 @@ const drawFirstNationsChart = data => {
             .attr("r", 3.5)
             .attr("fill", color)
             .attr("tabindex", 0)
+            .attr("aria-pressed", "false")
             .attr("aria-label", d => `${d.status}, ${d.year}: ${formatNumber(d.hospitalisations)} hospitalisations`)
-            .on("mouseenter", (event, d) => {
-                tooltip.style("opacity", 1)
-                    .html(
-                        `<strong>${d.status}, ${d.year}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations<br>Unit: count`
-                    );
-            })
-            .on("mousemove", event => {
-                tooltip.style("left", `${event.clientX + 12}px`)
-                    .style("top", `${event.clientY - 30}px`);
-            })
-            .on("mouseleave", () => tooltip.style("opacity", 0));
+            .attr("r", 0);
+
+        points.transition()
+            .delay((d, i) => i * 50)
+            .duration(350)
+            .attr("r", 3.5);
+
+        bindTooltip(
+            points,
+            tooltip,
+            d => `<strong>${d.status}, ${d.year}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations`
+        );
 
     });
 

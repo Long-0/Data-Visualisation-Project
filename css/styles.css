@@ -146,6 +146,30 @@ nav a.active, nav a:hover {
     margin-bottom: 28px;
 }
 
+.dashboard-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 18px;
+}
+
+.dashboard-controls label {
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.dashboard-controls select {
+    min-width: 92px;
+    height: 38px;
+    padding: 0 34px 0 11px;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 .project-label {
     margin: 0 0 8px;
     color: var(--blue);
@@ -196,9 +220,7 @@ h1 {
 .metric-card .positive { color: var(--green); font-weight: 700; }
 
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+    display: block;
 }
 
 .chart-card {
@@ -208,6 +230,18 @@ h1 {
     border: 1px solid var(--line);
     border-radius: 12px;
     box-shadow: 0 4px 14px rgba(27, 47, 84, 0.04);
+}
+
+.chart-card-page {
+    min-height: 520px;
+}
+
+.chart-card-page .chart {
+    min-height: 430px;
+}
+
+.chart-card-page[hidden] {
+    display: none;
 }
 
 .chart-card-large { grid-column: span 2; }
@@ -237,6 +271,9 @@ h2 {
 .chart > svg {
     display: block;
     min-width: 320px;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
 }
 
 .chart-card-large .chart { min-height: 286px; }
@@ -253,6 +290,47 @@ h2 {
 .legend-item { display: inline-flex; align-items: center; margin-right: 16px; }
 .legend-swatch { width: 9px; height: 9px; margin-right: 5px; border-radius: 50%; }
 .tooltip { position: fixed; z-index: 2; pointer-events: none; padding: 8px 10px; color: #fff; background: rgba(23, 35, 60, 0.94); border-radius: 6px; font-size: 12px; line-height: 1.45; }
+.chart-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    height: 30px;
+    margin: 4px 0 0;
+}
+
+.chart-toolbar button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.chart-toolbar button:hover,
+.chart-toolbar button:focus-visible {
+    color: var(--blue);
+    background: var(--blue-soft);
+    border-color: #cbd9f7;
+    outline: none;
+}
+
+.chart svg {
+    transition: transform 180ms ease;
+    transform-origin: top left;
+}
+
+.chart svg [tabindex="0"] {
+    cursor: pointer;
+}
+
+.chart svg [tabindex="0"]:focus {
+    outline: 3px solid rgba(38, 107, 232, 0.35);
+    outline-offset: 2px;
+}
 
 @media (max-width: 1050px) {
     .sidebar { width: 205px; }
@@ -268,6 +346,7 @@ h2 {
     nav a { white-space: nowrap; }
     .dashboard { padding: 24px 14px 40px; }
     .topbar { display: block; }
+    .dashboard-controls { padding-top: 14px; }
     .metric-grid, .dashboard-grid { grid-template-columns: 1fr; }
     .chart-card-large { grid-column: auto; }
 }

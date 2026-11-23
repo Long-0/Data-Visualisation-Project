@@ -1,6 +1,7 @@
-const drawAgeChart = data => {
+const drawAgeChart = (data, selectedYear = 2021) => {
+    d3.select("#age-chart").html("");
     const values = data.filter(
-        d => d.year === 2021 &&
+        d => d.year === selectedYear &&
             (d.sex === "Female" || d.sex === "Male")
     );
 
@@ -53,7 +54,7 @@ const drawAgeChart = data => {
 
     const tooltip = addTooltip();
 
-    groups.selectAll("rect")
+    const bars = groups.selectAll("rect")
         .data(age => values.filter(d => d.age === age))
         .join("rect")
         .attr("class", "bar")
@@ -63,18 +64,22 @@ const drawAgeChart = data => {
         .attr("height", d => height - margin.bottom - y(d.hospitalisations))
         .attr("fill", d => d.sex === "Female" ? colors.female : colors.male)
         .attr("tabindex", 0)
-        .attr("aria-label", d => `${d.age}, ${d.sex}, 2021: ${formatNumber(d.hospitalisations)} hospitalisations`)
-        .on("mouseenter", (event, d) => {
-            tooltip.style("opacity", 1)
-                .html(
-                    `<strong>${d.age}, ${d.sex}, 2021</strong><br>${formatNumber(d.hospitalisations)} hospitalisations<br>Unit: count`
-                );
-        })
-        .on("mousemove", event => {
-            tooltip.style("left", `${event.clientX + 12}px`)
-                .style("top", `${event.clientY - 30}px`);
-        })
-        .on("mouseleave", () => tooltip.style("opacity", 0));
+        .attr("aria-label", d => `${d.age}, ${d.sex}, ${selectedYear}: ${formatNumber(d.hospitalisations)} hospitalisations`)
+        .attr("aria-pressed", "false")
+        .attr("y", height - margin.bottom)
+        .attr("height", 0);
+
+    bars.transition()
+        .duration(650)
+        .ease(d3.easeCubicOut)
+        .attr("y", d => y(d.hospitalisations))
+        .attr("height", d => height - margin.bottom - y(d.hospitalisations));
+
+    bindTooltip(
+        bars,
+        tooltip,
+        d => `<strong>${d.age}, ${d.sex}, ${selectedYear}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations`
+    );
 
     const legend = d3.select("#age-chart")
         .append("div")

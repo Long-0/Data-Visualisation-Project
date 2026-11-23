@@ -41,12 +41,17 @@ const drawNationalChart = data => {
         .attr("fill", "none")
         .attr("stroke", colors.blue)
         .attr("stroke-width", 3)
+        .attr("opacity", 0)
         .attr(
             "d",
             d3.line()
                 .x(d => x(d.year))
                 .y(d => y(d.hospitalisations))
-        );
+        )
+        .transition()
+        .duration(700)
+        .ease(d3.easeCubicOut)
+        .attr("opacity", 1);
 
     svg.append("line")
         .attr("x1", x(data[data.length - 1].year))
@@ -58,7 +63,7 @@ const drawNationalChart = data => {
 
     const tooltip = addTooltip();
 
-    svg.selectAll("circle")
+    const points = svg.selectAll("circle")
         .data(data)
         .join("circle")
         .attr("cx", d => x(d.year))
@@ -66,17 +71,19 @@ const drawNationalChart = data => {
         .attr("r", d => d.year === data[data.length - 1].year ? 6 : 3.5)
         .attr("fill", (d, i) => i === data.length - 1 ? colors.orange : colors.blue)
         .attr("tabindex", 0)
+        .attr("aria-pressed", "false")
         .attr("aria-label", d => `${d.year}: ${formatNumber(d.hospitalisations)} hospitalisations`)
-        .on("mouseenter", (event, d) => {
-            tooltip.style("opacity", 1)
-                .html(
-                    `<strong>${d.year}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations<br>Unit: count`
-                );
-        })
-        .on("mousemove", event => {
-            tooltip.style("left", `${event.clientX + 12}px`)
-                .style("top", `${event.clientY - 30}px`);
-        })
-        .on("mouseleave", () => tooltip.style("opacity", 0));
+        .attr("r", 0);
+
+    points.transition()
+        .delay((d, i) => i * 45)
+        .duration(350)
+        .attr("r", d => d.year === data[data.length - 1].year ? 6 : 3.5);
+
+    bindTooltip(
+        points,
+        tooltip,
+        d => `<strong>${d.year}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations`
+    );
 
 };
