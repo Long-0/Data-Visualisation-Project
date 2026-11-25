@@ -1,11 +1,18 @@
+const ageGroups = ["0-7", "8-16", "17-25", "26-39", "40-64", "65+"];
+const sexGroups = ["Female", "Male"];
+const ageSexColors = {
+    Female: colors.blue,
+    Male: colors.teal
+};
+
 const drawAgeChart = (data, selectedYear = 2021) => {
     d3.select("#age-chart").html("");
     const values = data.filter(
         d => d.year === selectedYear &&
-            (d.sex === "Female" || d.sex === "Male")
+            sexGroups.includes(d.sex) &&
+            ageGroups.includes(d.age)
     );
-
-    const ages = [...new Set(values.map(d => d.age))];
+    const ages = ageGroups.filter(age => values.some(d => d.age === age));
     const { svg, width, height, margin } = createSvg(
         "#age-chart",
         340,
@@ -62,7 +69,7 @@ const drawAgeChart = (data, selectedYear = 2021) => {
         .attr("y", d => y(d.hospitalisations))
         .attr("width", xSex.bandwidth())
         .attr("height", d => height - margin.bottom - y(d.hospitalisations))
-        .attr("fill", d => d.sex === "Female" ? colors.female : colors.male)
+        .attr("fill", d => ageSexColors[d.sex])
         .attr("tabindex", 0)
         .attr("aria-label", d => `${d.age}, ${d.sex}, ${selectedYear}: ${formatNumber(d.hospitalisations)} hospitalisations`)
         .attr("aria-pressed", "false")
@@ -89,7 +96,7 @@ const drawAgeChart = (data, selectedYear = 2021) => {
         legend.append("span")
             .attr("class", "legend-item")
             .html(
-                `<span class="legend-swatch" style="background:${sex === "Female" ? colors.female : colors.male}"></span>${sex}`
+                `<span class="legend-swatch" style="background:${ageSexColors[sex]}"></span>${sex}`
             );
     });
 

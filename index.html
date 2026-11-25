@@ -27,7 +27,7 @@
                     <p class="intro">A clear view of hospitalisation trends, patterns and population groups.</p>
                 </div>
                 <div class="dashboard-controls">
-                    <label for="year-filter">Year</label>
+                    <label for="year-filter">Reporting year</label>
                     <select id="year-filter" aria-label="Filter charts by year">
                         <option value="2021" selected>2021</option>
                         <option value="2020">2020</option>
@@ -43,6 +43,49 @@
                     </select>
                 </div>
             </header>
+
+            <section class="metric-grid" aria-label="Key injury statistics">
+                <article class="metric-card">
+                    <div class="metric-copy">
+                        <span class="metric-label">Hospital admissions</span>
+                        <strong id="metric-admissions">—</strong>
+                        <small id="metric-admissions-change">Loading data…</small>
+                    </div>
+                    <svg id="metric-admissions-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-copy">
+                        <span class="metric-label">Net bed days</span>
+                        <strong id="metric-bed-days">—</strong>
+                        <small id="metric-bed-days-change">Loading data…</small>
+                    </div>
+                    <svg id="metric-bed-days-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-copy">
+                        <span class="metric-label">Deaths</span>
+                        <strong id="metric-deaths">—</strong>
+                        <small id="metric-deaths-change">Loading data…</small>
+                    </div>
+                    <svg id="metric-deaths-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-copy">
+                        <span class="metric-label">Leading state</span>
+                        <strong id="metric-leading-state">—</strong>
+                        <small id="metric-leading-state-change">Loading data…</small>
+                    </div>
+                    <svg id="metric-leading-state-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
+                </article>
+                <article class="metric-card">
+                    <div class="metric-copy">
+                        <span class="metric-label">Leading road user</span>
+                        <strong id="metric-leading-road-user">—</strong>
+                        <small id="metric-leading-road-user-change">Loading data…</small>
+                    </div>
+                    <svg id="metric-leading-road-user-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
+                </article>
+            </section>
 
             <section class="dashboard-grid">
                 <article id="trends" class="chart-card chart-card-page" data-chart-page="national">
@@ -62,7 +105,7 @@
                     <div id="age-chart" class="chart" aria-label="Grouped bar chart of age and sex hospitalisations in 2021"></div>
                 </article>
                 <article id="about" class="chart-card chart-card-page" data-chart-page="first-nations" hidden>
-                    <div class="card-heading"><div><h2>The gap remains substantial: act on preventable injury risk</h2></div></div>
+                    <div class="card-heading"><div><h2>First Nations hospital admissions nearly doubled between 2011 and 2021</h2></div></div>
                     <div id="first-nations-chart" class="chart" aria-label="Line chart comparing First Nations and non-Indigenous hospitalisations"></div>
                 </article>
             </section>

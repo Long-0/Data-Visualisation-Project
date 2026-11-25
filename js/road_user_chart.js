@@ -3,6 +3,7 @@ const drawRoadUserChart = (data, selectedYear = 2021) => {
     const values = data
         .filter(d => d.year === selectedYear)
         .sort((a, b) => d3.descending(a.hospitalisations, b.hospitalisations));
+    const total = d3.sum(values, d => d.hospitalisations);
 
     const { svg, width, height, margin } = createSvg(
         "#road-user-chart",
@@ -16,7 +17,7 @@ const drawRoadUserChart = (data, selectedYear = 2021) => {
         .padding(0.18);
 
     const y = d3.scaleLinear()
-        .domain([0, d3.max(values, d => d.hospitalisations)])
+        .domain([0, d3.max(values, d => d.hospitalisations) * 1.15])
         .nice()
         .range([height - margin.bottom, margin.top]);
 
@@ -54,7 +55,9 @@ const drawRoadUserChart = (data, selectedYear = 2021) => {
         .attr("height", d => height - margin.bottom - y(d.hospitalisations))
         .attr("fill", d => d.roadUser === "Car driver" ? colors.orange : colors.grey)
         .attr("tabindex", 0)
-        .attr("aria-label", d => `${d.roadUser}, ${selectedYear}: ${formatNumber(d.hospitalisations)} hospitalisations`)
+        .attr("aria-label", d =>
+            `${d.roadUser}, ${selectedYear}: ${formatNumber(d.hospitalisations)} hospitalisations, ${(d.hospitalisations / total * 100).toFixed(1)}% of total`
+        )
         .attr("aria-pressed", "false")
         .attr("y", height - margin.bottom)
         .attr("height", 0);
@@ -65,10 +68,22 @@ const drawRoadUserChart = (data, selectedYear = 2021) => {
         .attr("y", d => y(d.hospitalisations))
         .attr("height", d => height - margin.bottom - y(d.hospitalisations));
 
+    svg.selectAll(".bar-share-label")
+        .data(values)
+        .join("text")
+        .attr("class", "bar-share-label")
+        .attr("x", d => x(d.roadUser) + x.bandwidth() / 2)
+        .attr("y", d => y(d.hospitalisations) - 7)
+        .attr("text-anchor", "middle")
+        .attr("fill", colors.ink)
+        .attr("font-size", 11)
+        .attr("font-weight", 700)
+        .text(d => `${(d.hospitalisations / total * 100).toFixed(1)}%`);
+
     bindTooltip(
         bars,
         tooltip,
-        d => `<strong>${d.roadUser}, ${selectedYear}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations`
+        d => `<strong>${d.roadUser}, ${selectedYear}</strong><br>${formatNumber(d.hospitalisations)} hospitalisations (${(d.hospitalisations / total * 100).toFixed(1)}% of total)`
     );
 
 };

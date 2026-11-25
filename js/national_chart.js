@@ -1,4 +1,5 @@
 const drawNationalChart = data => {
+    d3.select("#national-chart").html("");
     const { svg, width, height, margin } = createSvg(
         "#national-chart",
         300,
@@ -69,7 +70,7 @@ const drawNationalChart = data => {
         .attr("cx", d => x(d.year))
         .attr("cy", d => y(d.hospitalisations))
         .attr("r", d => d.year === data[data.length - 1].year ? 6 : 3.5)
-        .attr("fill", (d, i) => i === data.length - 1 ? colors.orange : colors.blue)
+        .attr("fill", colors.blue)
         .attr("tabindex", 0)
         .attr("aria-pressed", "false")
         .attr("aria-label", d => `${d.year}: ${formatNumber(d.hospitalisations)} hospitalisations`)
