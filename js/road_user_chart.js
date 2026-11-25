@@ -87,3 +87,71 @@ const drawRoadUserChart = (data, selectedYear = 2021) => {
     );
 
 };
+
+const drawRoadUserTrendChart = (data, selectedYear = 2021) => {
+    d3.select("#road-user-trend-chart").html("");
+    const values = data
+        .filter(row => row.year === selectedYear)
+        .sort((a, b) => d3.descending(a.hospitalisations, b.hospitalisations));
+    const total = d3.sum(values, row => row.hospitalisations);
+    const height = 370;
+    const margin = { top: 18, right: 24, bottom: 30, left: 24 };
+    const { svg, width } = createSvg("#road-user-trend-chart", height, margin);
+    const radius = Math.max(0, Math.min(
+        width - margin.left - margin.right,
+        height - margin.top - margin.bottom
+    ) / 2);
+    const colorsByGroup = d3.scaleOrdinal()
+        .domain(values.map(row => row.roadUser))
+        .range(d3.schemeTableau10);
+    const pie = d3.pie()
+        .sort(null)
+        .value(row => row.hospitalisations);
+    const arcs = pie(values);
+    const arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+    const labelArc = d3.arc()
+        .innerRadius(radius * 0.62)
+        .outerRadius(radius * 0.62);
+    const chart = svg.append("g")
+        .attr("transform", `translate(${width / 2},${height / 2})`);
+
+    const tooltip = addTooltip();
+    const slices = chart.selectAll(".road-user-slice")
+        .data(arcs)
+        .join("path")
+        .attr("class", "road-user-slice")
+        .attr("d", arc)
+        .attr("fill", row => colorsByGroup(row.data.roadUser))
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+        .attr("tabindex", 0)
+        .attr("aria-label", row =>
+            `${row.data.roadUser}: ${formatNumber(row.data.hospitalisations)} admissions, ${d3.format(".1%")(row.data.hospitalisations / total)}`
+        );
+    bindTooltip(slices, tooltip, row =>
+        `<strong>${row.data.roadUser}</strong><br>${formatNumber(row.data.hospitalisations)} admissions (${d3.format(".1%")(row.data.hospitalisations / total)})`
+    );
+
+    chart.selectAll(".road-user-share-label")
+        .data(arcs.filter(row => row.data.hospitalisations / total >= 0.06))
+        .join("text")
+        .attr("class", "road-user-share-label")
+        .attr("transform", row => `translate(${labelArc.centroid(row)})`)
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .attr("fill", "#fff")
+        .attr("font-size", 11)
+        .attr("font-weight", 700)
+        .text(row => d3.format(".1%")(row.data.hospitalisations / total));
+
+    const legend = d3.select("#road-user-trend-chart").append("div").attr("class", "legend");
+    values.forEach(row => {
+        legend.append("span").attr("class", "legend-item")
+            .html(
+                `<span class="legend-swatch" style="background:${colorsByGroup(row.roadUser)}"></span>` +
+                `${row.roadUser} ${d3.format(".1%")(row.hospitalisations / total)}`
+            );
+    });
+};

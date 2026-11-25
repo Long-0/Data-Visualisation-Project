@@ -11,11 +11,11 @@
     <main class="app-shell">
         <aside class="sidebar">
             <nav aria-label="Dashboard sections">
-                <a class="active" href="#national-chart" data-page="national">national_chart.js</a>
-                <a href="#state-chart" data-page="state">state_chart.js</a>
-                <a href="#road-user-chart" data-page="road-user">road_user_chart.js</a>
-                <a href="#age-chart" data-page="age">age_chart.js</a>
-                <a href="#first-nations-chart" data-page="first-nations">first_nations_chart.js</a>
+                <a class="active" href="#national-chart" data-page="national">Finding 1</a>
+                <a href="#state-chart" data-page="state">Finding 2</a>
+                <a href="#road-user-chart" data-page="road-user">Finding 3</a>
+                <a href="#age-chart" data-page="age">Finding 4</a>
+                <a href="#first-nations-chart" data-page="first-nations">Finding 5</a>
             </nav>
         </aside>
 
@@ -24,7 +24,6 @@
                 <div>
                     <p class="project-label">DATA VISUALISATION PROJECT</p>
                     <h1>Australian injury hospitalisations</h1>
-                    <p class="intro">A clear view of hospitalisation trends, patterns and population groups.</p>
                 </div>
                 <div class="dashboard-controls">
                     <label for="year-filter">Reporting year</label>
@@ -41,35 +40,35 @@
                         <option value="2012">2012</option>
                         <option value="2011">2011</option>
                     </select>
+                    <label class="page-filter" for="age-sex-filter" hidden>Sex</label>
+                    <select id="age-sex-filter" class="page-filter" aria-label="Filter Finding 4 by sex" hidden>
+                        <option value="All" selected>All</option>
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                    </select>
+                    <label class="page-filter" for="first-nations-age-filter" hidden>Age group</label>
+                    <select id="first-nations-age-filter" class="page-filter" aria-label="Filter Finding 5 age-group chart" hidden>
+                        <option value="All" selected>All age groups</option>
+                        <option value="0-7">0–7</option>
+                        <option value="8-16">8–16</option>
+                        <option value="17-25">17–25</option>
+                        <option value="26-39">26–39</option>
+                        <option value="40-64">40–64</option>
+                        <option value="65+">65+</option>
+                    </select>
                 </div>
             </header>
 
-            <section class="metric-grid" aria-label="Key injury statistics">
-                <article class="metric-card">
+            <section class="metric-grid" data-visible-count="1" aria-label="Key injury statistics" hidden>
+                <article id="metric-admissions-card" class="metric-card" data-findings="national state road-user age first-nations">
                     <div class="metric-copy">
-                        <span class="metric-label">Hospital admissions</span>
+                        <span id="metric-admissions-label" class="metric-label">Hospital admissions</span>
                         <strong id="metric-admissions">—</strong>
                         <small id="metric-admissions-change">Loading data…</small>
                     </div>
                     <svg id="metric-admissions-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
                 </article>
-                <article class="metric-card">
-                    <div class="metric-copy">
-                        <span class="metric-label">Net bed days</span>
-                        <strong id="metric-bed-days">—</strong>
-                        <small id="metric-bed-days-change">Loading data…</small>
-                    </div>
-                    <svg id="metric-bed-days-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
-                </article>
-                <article class="metric-card">
-                    <div class="metric-copy">
-                        <span class="metric-label">Deaths</span>
-                        <strong id="metric-deaths">—</strong>
-                        <small id="metric-deaths-change">Loading data…</small>
-                    </div>
-                    <svg id="metric-deaths-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
-                </article>
-                <article class="metric-card">
+                <article class="metric-card" data-findings="state" hidden>
                     <div class="metric-copy">
                         <span class="metric-label">Leading state</span>
                         <strong id="metric-leading-state">—</strong>
@@ -77,7 +76,7 @@
                     </div>
                     <svg id="metric-leading-state-sparkline" class="metric-sparkline" aria-hidden="true"></svg>
                 </article>
-                <article class="metric-card">
+                <article class="metric-card" data-findings="road-user" hidden>
                     <div class="metric-copy">
                         <span class="metric-label">Leading road user</span>
                         <strong id="metric-leading-road-user">—</strong>
@@ -91,22 +90,57 @@
                 <article id="trends" class="chart-card chart-card-page" data-chart-page="national">
                     <div class="card-heading"><div><h2>Hospitalisations rose overall between 2011 and 2021</h2></div></div>
                     <div id="national-chart" class="chart" aria-label="Line chart of national hospitalisations by year"></div>
+                    <section class="supporting-chart" aria-labelledby="national-change-heading">
+                        <div class="supporting-heading">
+                            <h3 id="national-change-heading">Year-on-year change</h3>
+                            <p>Annual percentage change in hospitalisations compared with the previous year.</p>
+                        </div>
+                        <div id="national-change-chart" class="chart supplementary-chart" aria-label="Bar chart of annual percentage change in national hospitalisations"></div>
+                    </section>
                 </article>
                 <article class="chart-card chart-card-page" data-chart-page="state" hidden>
                     <div class="card-heading"><div><h2 id="state-chart-title">Victoria recorded the most injuries in 2021</h2></div></div>
                     <div id="state-chart" class="chart" aria-label="Bar chart of state hospitalisations in 2021"></div>
+                    <section class="supporting-chart" aria-labelledby="state-trend-heading">
+                        <div class="supporting-heading">
+                            <h3 id="state-trend-heading">State totals in 2011 and 2021</h3>
+                            <p>Compare counts across states and territories at the start and end of the period.</p>
+                        </div>
+                        <div id="state-trend-chart" class="chart supplementary-chart" aria-label="Grouped column chart comparing state hospitalisations in 2011 and 2021"></div>
+                    </section>
                 </article>
                 <article id="breakdown" class="chart-card chart-card-page" data-chart-page="road-user" hidden>
                     <div class="card-heading"><div><h2 id="road-user-chart-title">Car drivers account for the largest share</h2></div></div>
                     <div id="road-user-chart" class="chart" aria-label="Bar chart of road-user hospitalisations in 2021"></div>
+                    <section class="supporting-chart" aria-labelledby="road-user-trend-heading">
+                        <div class="supporting-heading">
+                            <h3 id="road-user-trend-heading">Hospitalisation share by road-user group</h3>
+                            <p>Each slice represents a group’s share of admissions in the selected year.</p>
+                        </div>
+                        <div id="road-user-trend-chart" class="chart supplementary-chart" aria-label="Pie chart of hospitalisation share by road-user group"></div>
+                    </section>
                 </article>
                 <article class="chart-card chart-card-page" data-chart-page="age" hidden>
                     <div class="card-heading"><div><h2 id="age-chart-title">Males aged 40–64 had the highest injury burden</h2></div></div>
                     <div id="age-chart" class="chart" aria-label="Grouped bar chart of age and sex hospitalisations in 2021"></div>
+                    <section class="supporting-chart" aria-labelledby="age-trend-heading">
+                        <div class="supporting-heading">
+                            <h3 id="age-trend-heading">Age and sex groups: 2011 vs 2021</h3>
+                            <p>Compare hospitalisations by age group for females, males, or both.</p>
+                        </div>
+                        <div id="age-trend-chart" class="chart supplementary-chart" aria-label="Grouped column chart of hospitalisations by age and sex in 2011 and 2021"></div>
+                    </section>
                 </article>
                 <article id="about" class="chart-card chart-card-page" data-chart-page="first-nations" hidden>
                     <div class="card-heading"><div><h2>First Nations hospital admissions nearly doubled between 2011 and 2021</h2></div></div>
                     <div id="first-nations-chart" class="chart" aria-label="Line chart comparing First Nations and non-Indigenous hospitalisations"></div>
+                    <section class="supporting-chart" aria-labelledby="first-nations-age-heading">
+                        <div class="supporting-heading">
+                            <h3 id="first-nations-age-heading">First Nations admissions by age group</h3>
+                            <p>Select an age group to compare 2011 and 2021 counts; these are not adjusted for population size.</p>
+                        </div>
+                        <div id="first-nations-age-chart" class="chart supplementary-chart" aria-label="Grouped column chart of First Nations hospitalisations by age group in 2011 and 2021"></div>
+                    </section>
                 </article>
             </section>
         </section>

@@ -3,12 +3,11 @@ const dataPath = "DATA/processed/";
 d3.csv(`${dataPath}national_annual.csv`, d => ({
     year: d["Calendar year"],
     hospitalisations: +d.Hospitalisations,
-    bedDays: +d.Net_Bed_Days,
-    deaths: +d.Died_cases
 })).then(data => {
     console.log("National data:", data);
     nationalData = data;
     drawNationalChart(data);
+    drawNationalChangeChart(data);
     renderMetricCards();
 });
 
@@ -17,6 +16,8 @@ let roadUserData = [];
 let ageData = [];
 let nationalData = [];
 let firstNationsData = [];
+let firstNationsAgeData = [];
+let activePage = "national";
 
 const stateDisplayNames = {
     ACT: "ACT",
@@ -63,15 +64,104 @@ const drawMetricSparkline = (selector, rows, valueAccessor) => {
         .attr("points", values.map((value, index) => `${x(index)},${y(value)}`).join(" "));
 };
 
+const updateMetricVisibility = () => {
+    let visibleCount = 0;
+    d3.selectAll(".metric-card").each(function () {
+        const pages = d3.select(this).attr("data-findings").split(/\s+/);
+        const waitingForPageData = (activePage === "first-nations" &&
+            this.id === "metric-admissions-card" &&
+            !firstNationsData.length) ||
+            (activePage === "age" &&
+                this.id === "metric-admissions-card" &&
+                !ageData.length);
+        const visible = pages.includes(activePage) && !waitingForPageData;
+        this.hidden = !visible;
+        if (visible) visibleCount += 1;
+    });
+
+    d3.select(".metric-grid")
+        .attr("data-visible-count", visibleCount)
+        .property("hidden", visibleCount === 0);
+};
+
 const renderMetricCards = () => {
+    updateMetricVisibility();
     const selectedYear = +d3.select("#year-filter").property("value");
     const annual = nationalData.find(row => +row.year === selectedYear);
     const stateRows = stateData.filter(row => row.year === selectedYear);
     const roadUserRows = roadUserData.filter(row => row.year === selectedYear);
-    if (!annual || !stateRows.length || !roadUserRows.length) return;
-
     const previousYear = selectedYear - 1;
     const previousAnnual = nationalData.find(row => +row.year === previousYear);
+
+    if (activePage === "first-nations") {
+        const firstNationsRows = firstNationsData
+            .filter(row => row.status === "First Nations people")
+            .sort((a, b) => d3.ascending(a.year, b.year));
+        const selectedFirstNations = firstNationsRows.find(row => row.year === selectedYear);
+        const firstNationsBaseline = firstNationsRows.find(row => row.year === 2011);
+        if (!selectedFirstNations || !firstNationsBaseline) return;
+
+        const change = (selectedFirstNations.hospitalisations - firstNationsBaseline.hospitalisations) /
+            firstNationsBaseline.hospitalisations * 100;
+        const sign = change > 0 ? "+" : "";
+        d3.select("#metric-admissions-label").text("First Nations admissions");
+        d3.select("#metric-admissions").text(formatNumber(selectedFirstNations.hospitalisations));
+        d3.select("#metric-admissions-change").text(selectedYear === 2011
+            ? "Baseline year"
+            : `vs 2011 (${sign}${change.toFixed(1)}%)`
+        );
+        drawMetricSparkline(
+            "#metric-admissions-sparkline",
+            firstNationsRows,
+            row => row.hospitalisations
+        );
+    } else if (activePage === "age") {
+        const selectedSex = d3.select("#age-sex-filter").property("value") || "All";
+        const ageSexRows = ageData.filter(row =>
+            row.year === selectedYear &&
+            ["Female", "Male"].includes(row.sex) &&
+            (selectedSex === "All" || row.sex === selectedSex)
+        );
+        const leadingAgeSex = d3.greatest(ageSexRows, row => row.hospitalisations);
+        if (!leadingAgeSex) return;
+
+        const previousAgeSex = ageData.find(row =>
+            row.year === previousYear &&
+            row.age === leadingAgeSex.age &&
+            row.sex === leadingAgeSex.sex
+        );
+        d3.select("#metric-admissions-label").text("Highest age-sex group");
+        d3.select("#metric-admissions").text(formatNumber(leadingAgeSex.hospitalisations));
+        d3.select("#metric-admissions-change").text(
+            `${leadingAgeSex.sex}, ${leadingAgeSex.age} · ${metricChangeText(
+                leadingAgeSex.hospitalisations,
+                previousAgeSex && previousAgeSex.hospitalisations,
+                previousYear
+            )}`
+        );
+        drawMetricSparkline(
+            "#metric-admissions-sparkline",
+            ageData
+                .filter(row => row.age === leadingAgeSex.age && row.sex === leadingAgeSex.sex)
+                .sort((a, b) => d3.ascending(a.year, b.year)),
+            row => row.hospitalisations
+        );
+    } else if (annual) {
+        d3.select("#metric-admissions-label").text("Hospital admissions");
+        d3.select("#metric-admissions").text(formatNumber(annual.hospitalisations));
+        d3.select("#metric-admissions-change").text(
+            metricChangeText(
+                annual.hospitalisations,
+                previousAnnual && previousAnnual.hospitalisations,
+                previousYear
+            )
+        );
+        drawMetricSparkline("#metric-admissions-sparkline", nationalData, row => row.hospitalisations);
+    } else {
+        return;
+    }
+
+    if (!stateRows.length || !roadUserRows.length) return;
     const leadingState = d3.greatest(stateRows, row => row.hospitalisations);
     const previousState = stateData.find(row =>
         row.year === previousYear && row.state === leadingState.state
@@ -80,24 +170,6 @@ const renderMetricCards = () => {
     const previousRoadUser = roadUserData.find(row =>
         row.year === previousYear && row.roadUser === leadingRoadUser.roadUser
     );
-
-    d3.select("#metric-admissions").text(formatNumber(annual.hospitalisations));
-    d3.select("#metric-admissions-change").text(
-        metricChangeText(annual.hospitalisations, previousAnnual && previousAnnual.hospitalisations, previousYear)
-    );
-    drawMetricSparkline("#metric-admissions-sparkline", nationalData, row => row.hospitalisations);
-
-    d3.select("#metric-bed-days").text(formatNumber(annual.bedDays));
-    d3.select("#metric-bed-days-change").text(
-        metricChangeText(annual.bedDays, previousAnnual && previousAnnual.bedDays, previousYear)
-    );
-    drawMetricSparkline("#metric-bed-days-sparkline", nationalData, row => row.bedDays);
-
-    d3.select("#metric-deaths").text(formatNumber(annual.deaths));
-    d3.select("#metric-deaths-change").text(
-        metricChangeText(annual.deaths, previousAnnual && previousAnnual.deaths, previousYear)
-    );
-    drawMetricSparkline("#metric-deaths-sparkline", nationalData, row => row.deaths);
 
     d3.select("#metric-leading-state").text(stateDisplayNames[leadingState.state] || leadingState.state);
     d3.select("#metric-leading-state-change").text(
@@ -128,6 +200,14 @@ const renderMetricCards = () => {
     );
 };
 
+const updateAgeChartTitle = (year, selectedSex) => {
+    d3.select("#age-chart-title").text(
+        selectedSex === "All"
+            ? `Age and sex hospitalisations in ${year}`
+            : `${selectedSex} hospitalisations by age group in ${year}`
+    );
+};
+
 d3.csv(`${dataPath}state_trends.csv`, d => ({
     year: +d["calendar year"],
     state: d.state,
@@ -136,19 +216,19 @@ d3.csv(`${dataPath}state_trends.csv`, d => ({
     console.log("State data:", data);
     stateData = data;
     drawStateChart(data);
+    drawStateTrendChart(data);
     renderMetricCards();
 });
 
 d3.csv(`${dataPath}road_user_trends.csv`, d => ({
     year: +d["Calendar year"],
     roadUser: d["Road user group"],
-    hospitalisations: +d.Hospitalisations,
-    bedDays: +d.Net_Bed_Days,
-    deaths: +d.Died_cases
+    hospitalisations: +d.Hospitalisations
 })).then(data => {
     console.log("Road-user data:", data);
     roadUserData = data;
     drawRoadUserChart(data);
+    drawRoadUserTrendChart(data, +d3.select("#year-filter").property("value"));
     renderMetricCards();
 });
 
@@ -160,7 +240,11 @@ d3.csv(`${dataPath}age_severity.csv`, d => ({
 })).then(data => {
     console.log("Age data:", data);
     ageData = data;
-    drawAgeChart(data);
+    const selectedSex = d3.select("#age-sex-filter").property("value") || "All";
+    updateAgeChartTitle(+d3.select("#year-filter").property("value"), selectedSex);
+    drawAgeChart(data, +d3.select("#year-filter").property("value"), selectedSex);
+    drawAgeTrendChart(data, selectedSex);
+    renderMetricCards();
 });
 
 d3.csv(`${dataPath}first_nations_trends.csv`, d => ({
@@ -171,6 +255,21 @@ d3.csv(`${dataPath}first_nations_trends.csv`, d => ({
     console.log("First Nations data:", data);
     firstNationsData = data;
     drawFirstNationsChart(data);
+    renderMetricCards();
+});
+
+d3.csv(`${dataPath}first_nations_age.csv`, d => ({
+    year: +d["Calendar year"],
+    age: d["Age group"],
+    hospitalisations: +d.Hospitalisations
+})).then(data => {
+    firstNationsAgeData = data;
+    if (window.location.hash === "#first-nations") {
+        drawFirstNationsAgeChart(
+            data,
+            d3.select("#first-nations-age-filter").property("value") || "All"
+        );
+    }
 });
 
 d3.select("#year-filter").on("change", function () {
@@ -178,13 +277,46 @@ d3.select("#year-filter").on("change", function () {
     renderMetricCards();
     d3.select("#state-chart-title").text(`State hospitalisations in ${selectedYear}`);
     d3.select("#road-user-chart-title").text(`Road-user hospitalisations in ${selectedYear}`);
-    d3.select("#age-chart-title").text(`Age and sex hospitalisations in ${selectedYear}`);
+    updateAgeChartTitle(
+        selectedYear,
+        d3.select("#age-sex-filter").property("value") || "All"
+    );
     if (stateData.length) drawStateChart(stateData, selectedYear);
-    if (roadUserData.length) drawRoadUserChart(roadUserData, selectedYear);
-    if (ageData.length) drawAgeChart(ageData, selectedYear);
+    if (roadUserData.length) {
+        drawRoadUserChart(roadUserData, selectedYear);
+        drawRoadUserTrendChart(roadUserData, selectedYear);
+    }
+    if (ageData.length) {
+        drawAgeChart(
+            ageData,
+            selectedYear,
+            d3.select("#age-sex-filter").property("value") || "All"
+        );
+    }
+});
+
+d3.select("#age-sex-filter").on("change", function () {
+    const selectedSex = this.value;
+    const selectedYear = +d3.select("#year-filter").property("value");
+    updateAgeChartTitle(selectedYear, selectedSex);
+    renderMetricCards();
+    if (ageData.length) {
+        drawAgeChart(ageData, selectedYear, selectedSex);
+        drawAgeTrendChart(ageData, selectedSex);
+    }
+});
+
+d3.select("#first-nations-age-filter").on("change", function () {
+    if (firstNationsAgeData.length) {
+        drawFirstNationsAgeChart(firstNationsAgeData, this.value);
+    }
 });
 
 const showChartPage = pageName => {
+    activePage = pageName;
+    updateMetricVisibility();
+    renderMetricCards();
+    d3.selectAll("body > .tooltip").remove();
     d3.selectAll(".chart-card-page")
         .attr("hidden", function () {
             return d3.select(this).attr("data-chart-page") === pageName ? null : true;
@@ -196,6 +328,11 @@ const showChartPage = pageName => {
         });
 
     d3.select(".dashboard-controls").style("display", "flex");
+    d3.select("#age-sex-filter").property("hidden", pageName !== "age");
+    d3.select('label[for="age-sex-filter"]').property("hidden", pageName !== "age");
+    d3.select("#first-nations-age-filter").property("hidden", pageName !== "first-nations");
+    d3.select('label[for="first-nations-age-filter"]')
+        .property("hidden", pageName !== "first-nations");
 
     const visibleChart = d3.select(`[data-chart-page="${pageName}"] .chart`);
     const svg = visibleChart.select("svg");
@@ -207,15 +344,35 @@ const showChartPage = pageName => {
         if (pageName === "national" && nationalData.length) {
             d3.select("#national-chart").html("");
             drawNationalChart(nationalData);
+            drawNationalChangeChart(nationalData);
         } else if (pageName === "state" && stateData.length) {
             drawStateChart(stateData, +d3.select("#year-filter").property("value"));
+            drawStateTrendChart(stateData);
         } else if (pageName === "road-user" && roadUserData.length) {
-            drawRoadUserChart(roadUserData, +d3.select("#year-filter").property("value"));
+            const selectedYear = +d3.select("#year-filter").property("value");
+            drawRoadUserChart(roadUserData, selectedYear);
+            drawRoadUserTrendChart(roadUserData, selectedYear);
         } else if (pageName === "age" && ageData.length) {
-            drawAgeChart(ageData, +d3.select("#year-filter").property("value"));
+            const selectedSex = d3.select("#age-sex-filter").property("value") || "All";
+            updateAgeChartTitle(
+                +d3.select("#year-filter").property("value"),
+                selectedSex
+            );
+            drawAgeChart(
+                ageData,
+                +d3.select("#year-filter").property("value"),
+                selectedSex
+            );
+            drawAgeTrendChart(ageData, selectedSex);
         } else if (pageName === "first-nations" && firstNationsData.length) {
             d3.select("#first-nations-chart").html("");
             drawFirstNationsChart(firstNationsData);
+            if (firstNationsAgeData.length) {
+                drawFirstNationsAgeChart(
+                    firstNationsAgeData,
+                    d3.select("#first-nations-age-filter").property("value") || "All"
+                );
+            }
         }
     });
 };

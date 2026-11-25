@@ -35,10 +35,12 @@ const createSvg = (
 };
 
 const addTooltip = () => {
-    return d3.select("body")
-        .append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    const existing = d3.select("body > .tooltip");
+    return existing.empty()
+        ? d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0)
+        : existing;
 };
 
 const bindTooltip = (selection, tooltip, getHtml) => {
