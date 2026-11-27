@@ -88,6 +88,16 @@ const drawRoadUserChart = (data, selectedYear = 2021) => {
 
 };
 
+const roadUserPalette = [
+    colors.orange,
+    colors.blue,
+    colors.teal,
+    colors.skyBlue,
+    colors.reddishPurple,
+    colors.yellow,
+    colors.grey
+];
+
 const drawRoadUserTrendChart = (data, selectedYear = 2021) => {
     d3.select("#road-user-trend-chart").html("");
     const values = data
@@ -101,9 +111,10 @@ const drawRoadUserTrendChart = (data, selectedYear = 2021) => {
         width - margin.left - margin.right,
         height - margin.top - margin.bottom
     ) / 2);
+    const roadUserGroups = [...new Set(data.map(row => row.roadUser))].sort();
     const colorsByGroup = d3.scaleOrdinal()
-        .domain(values.map(row => row.roadUser))
-        .range(d3.schemeTableau10);
+        .domain(roadUserGroups)
+        .range(roadUserPalette);
     const pie = d3.pie()
         .sort(null)
         .value(row => row.hospitalisations);
@@ -141,7 +152,9 @@ const drawRoadUserTrendChart = (data, selectedYear = 2021) => {
         .attr("transform", row => `translate(${labelArc.centroid(row)})`)
         .attr("text-anchor", "middle")
         .attr("dominant-baseline", "middle")
-        .attr("fill", "#fff")
+        .attr("fill", row => [colors.skyBlue, colors.yellow].includes(
+            colorsByGroup(row.data.roadUser)
+        ) ? colors.ink : "#fff")
         .attr("font-size", 11)
         .attr("font-weight", 700)
         .text(row => d3.format(".1%")(row.data.hospitalisations / total));

@@ -2,7 +2,7 @@ const ageGroups = ["0-7", "8-16", "17-25", "26-39", "40-64", "65+"];
 const sexGroups = ["Female", "Male"];
 const ageSexColors = {
     Female: colors.blue,
-    Male: colors.teal
+    Male: colors.orange
 };
 
 const drawAgeChart = (data, selectedYear = 2021, selectedSex = "All") => {
@@ -140,7 +140,11 @@ const drawAgeTrendChart = (data, selectedSex = "All") => {
         .range([height - margin.bottom, margin.top]);
     const colorsBySeries = d3.scaleOrdinal()
         .domain(series)
-        .range(d3.schemeTableau10);
+        .range(series.map(seriesName => {
+            const [year, sex] = seriesName.split(" ");
+            if (sex === "Female") return year === "2011" ? colors.blue : colors.skyBlue;
+            return year === "2011" ? colors.orange : colors.reddishPurple;
+        }));
 
     svg.append("g")
         .attr("class", "grid-line")

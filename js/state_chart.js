@@ -49,7 +49,7 @@ const drawStateChart = (data, selectedYear = 2021) => {
         .attr("y", d => y(d.hospitalisations))
         .attr("width", x.bandwidth())
         .attr("height", d => height - margin.bottom - y(d.hospitalisations))
-        .attr("fill", d => d.state === "Vic" ? colors.orange : colors.grey)
+        .attr("fill", d => d.state === values[0].state ? colors.orange : colors.grey)
         .attr("tabindex", 0)
         .attr("aria-label", d => `${d.state}, ${selectedYear}: ${formatNumber(d.hospitalisations)} hospitalisations`)
         .attr("aria-pressed", "false")

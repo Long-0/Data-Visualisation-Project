@@ -190,7 +190,9 @@ const drawGroupedColumns = (selector, data, groups, series, groupOf, seriesOf) =
     const color = d3.scaleOrdinal().domain(series)
         .range(series.length === 2 && series[0] === "Female"
             ? [pageColors.female, pageColors.male]
-            : [colors.blue, colors.orange]);
+            : series.length === 4 && series[0] === "2011 Female"
+                ? [colors.blue, colors.orange, colors.skyBlue, colors.reddishPurple]
+                : [colors.blue, colors.orange]);
     const columns = svg.selectAll(".column-group").data(groups).join("g")
         .attr("class", "column-group")
         .attr("transform", group => `translate(${x(group)},0)`);
@@ -338,26 +340,26 @@ window.addEventListener("resize", () => {
 });
 
 Promise.all([
-    d3.csv("DATA/processed/national_annual.csv", row => ({
+    d3.csv("Data/processed/national_annual.csv", row => ({
         year: +row["Calendar year"],
         hospitalisations: +row.Hospitalisations
     })),
-    d3.csv("DATA/processed/state_trends.csv", row => ({
+    d3.csv("Data/processed/state_trends.csv", row => ({
         year: +row["calendar year"],
         state: row.state,
         hospitalisations: +row.hospitalisations
     })),
-    d3.csv("DATA/processed/road_user_trends.csv", row => ({
+    d3.csv("Data/processed/road_user_trends.csv", row => ({
         year: +row["Calendar year"],
         roadUser: row["Road user group"],
         hospitalisations: +row.Hospitalisations
     })),
-    d3.csv("DATA/processed/age_severity.csv", row => ({
+    d3.csv("Data/processed/age_severity.csv", row => ({
         age: row["Age group"],
         sex: row.Sex,
         hospitalisations: +row.Hospitalisations
     })),
-    d3.csv("DATA/processed/first_nations_trends.csv", row => ({
+    d3.csv("Data/processed/first_nations_trends.csv", row => ({
         year: +row["Calendar year"],
         status: row["First Nations status"],
         age: row["Age group"],

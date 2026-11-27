@@ -1,4 +1,4 @@
-const dataPath = "DATA/processed/";
+const dataPath = "Data/processed/";
 
 d3.csv(`${dataPath}national_annual.csv`, d => ({
     year: d["Calendar year"],
